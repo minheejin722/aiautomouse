@@ -1,0 +1,47 @@
+log_level: INFO
+poll_interval_ms: 250
+overlay:
+  enabled: true
+  duration_ms: 900
+cdp:
+  url: http://127.0.0.1:9222
+browser:
+  cdp_url: http://127.0.0.1:9222
+  launch_on_demand: true
+  channel: msedge
+  headless: false
+  default_timeout_ms: 5000
+  connect_timeout_ms: 1500
+emergency_stop_hotkey: Ctrl+Alt+Pause
+paths:
+  snippets_dir: assets/snippets
+  templates_dir: assets/templates
+  macros_dir: macros/samples
+  hotkeys_path: config/hotkeys.yaml
+  logs_dir: logs
+  artifacts_dir: logs/runs
+  schema_path: schemas/macro.schema.json
+ocr:
+  backends:
+    - windows
+    - tesseract
+    - easyocr
+  tesseract_cmd: C:\Program Files\Tesseract-OCR\tesseract.exe
+  easyocr_languages:
+    - en
+    - ko
+  rate_limit_ms: 150
+  cache_size: 128
+capture:
+  backend: mss
+diagnostics:
+  capture_before_after_screenshots: true
+  capture_active_window_snapshot: true
+  dump_ocr_results: true
+  dump_image_match_candidates: true
+  replay_log_enabled: true
+  max_dump_candidates: 10
+ui:
+  recent_runs_limit: 50
+  default_macro_mode: dry-run
+  auto_start_hotkeys: false

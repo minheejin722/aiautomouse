@@ -1,0 +1,10 @@
+bindings:
+  - hotkey: Ctrl+Alt+1
+    macro: macros/samples/focus_and_paste.json
+    mode: dry-run
+  - hotkey: Ctrl+Alt+2
+    macro: macros/samples/image_click_retry.json
+    mode: dry-run
+  - hotkey: Ctrl+Alt+3
+    macro: macros/samples/conditional_submit.json
+    mode: dry-run

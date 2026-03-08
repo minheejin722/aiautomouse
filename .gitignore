@@ -1,0 +1,15 @@
+.pytest_cache/
+__pycache__/
+.mypy_cache/
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+artifacts/
+logs/
+*.pyc
+*.pyo
+*.pyd
+Thumbs.db
+Desktop.ini

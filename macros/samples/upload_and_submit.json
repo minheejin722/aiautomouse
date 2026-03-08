@@ -1,0 +1,69 @@
+{
+  "schema_version": "2.0",
+  "name": "upload_and_submit",
+  "hotkey": "ctrl+alt+1",
+  "target_profile": "default",
+  "variables": {
+    "upload_label": "업로드",
+    "complete_label": "완료"
+  },
+  "resources": {
+    "snippets": {
+      "prompt_01": "assets/snippets/hello.txt"
+    },
+    "templates": {
+      "done_icon": "assets/templates/calc_equals.png"
+    }
+  },
+  "anchors": {
+    "chrome_window": {
+      "window": {
+        "title_contains": "Chrome"
+      }
+    }
+  },
+  "steps": [
+    {
+      "type": "focus_window",
+      "id": "focus_browser",
+      "title_contains": "Chrome"
+    },
+    {
+      "type": "find_text",
+      "id": "find_upload_button",
+      "query": "${upload_label}",
+      "strategy": "uia_or_ocr",
+      "save_as": "upload_btn"
+    },
+    {
+      "type": "click_ref",
+      "id": "click_upload_button",
+      "ref": "upload_btn"
+    },
+    {
+      "type": "paste_snippet",
+      "id": "paste_prompt",
+      "snippet_id": "prompt_01"
+    },
+    {
+      "type": "press_keys",
+      "id": "submit_prompt",
+      "keys": "enter"
+    },
+    {
+      "type": "verify_any",
+      "id": "verify_completion",
+      "conditions": [
+        {
+          "type": "text_exists",
+          "query": "${complete_label}",
+          "strategy": "uia_or_ocr"
+        },
+        {
+          "type": "image_exists",
+          "template_id": "done_icon"
+        }
+      ]
+    }
+  ]
+}

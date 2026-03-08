@@ -1,0 +1,43 @@
+{
+  "schema_version": "2.0",
+  "name": "browser_playwright_data_url",
+  "description": "Launch a browser page, locate DOM targets through Playwright, and route actions through the browser adapter.",
+  "steps": [
+    {
+      "type": "open_page",
+      "url": "data:text/html,<html><body><input aria-label='Search'/><button>Upload</button></body></html>",
+      "new_window": true,
+      "wait_until": "load"
+    },
+    {
+      "type": "click",
+      "target": {
+        "dom": {
+          "label": "Search",
+          "wait_for": "visible",
+          "require_enabled": true,
+          "require_stable": true
+        }
+      }
+    },
+    {
+      "type": "type_text",
+      "text": "desktop automation"
+    },
+    {
+      "type": "find_text",
+      "query": "Upload",
+      "strategy": "dom",
+      "save_as": "upload_btn"
+    },
+    {
+      "type": "click_ref",
+      "ref": "upload_btn"
+    },
+    {
+      "type": "verify_text",
+      "query": "Upload",
+      "strategy": "dom"
+    }
+  ]
+}

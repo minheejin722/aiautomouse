@@ -1,0 +1,51 @@
+{
+  "schema_version": "2.0",
+  "name": "focus_and_paste",
+  "hotkey": "Ctrl+Alt+1",
+  "target_profile": "default",
+  "resources": {
+    "snippets": {
+      "prompt_01": "assets/snippets/hello.txt"
+    }
+  },
+  "steps": [
+    {
+      "type": "focus_window",
+      "id": "focus_notepad",
+      "title_contains": "Notepad",
+      "retry": {
+        "max_attempts": 2,
+        "delay_ms": 400
+      }
+    },
+    {
+      "type": "find_text",
+      "id": "find_editor",
+      "query": "Text Editor",
+      "strategy": "uia_or_ocr",
+      "save_as": "editor"
+    },
+    {
+      "type": "click",
+      "id": "activate_editor",
+      "ref": "editor"
+    },
+    {
+      "type": "paste_snippet",
+      "id": "paste_prompt",
+      "snippet_id": "prompt_01",
+      "ref": "editor"
+    },
+    {
+      "type": "press_keys",
+      "id": "add_newline",
+      "keys": "enter"
+    },
+    {
+      "type": "verify_text",
+      "id": "verify_editor_active",
+      "query": "Notepad",
+      "strategy": "uia_or_ocr"
+    }
+  ]
+}

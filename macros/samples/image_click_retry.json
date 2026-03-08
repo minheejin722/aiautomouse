@@ -1,0 +1,43 @@
+{
+  "schema_version": "2.0",
+  "name": "image_click_retry",
+  "hotkey": "Ctrl+Alt+2",
+  "resources": {
+    "templates": {
+      "done_icon": "assets/templates/calc_equals.png"
+    }
+  },
+  "retry_policies": {
+    "quick_retry": {
+      "max_attempts": 3,
+      "delay_ms": 350,
+      "backoff_multiplier": 1.2
+    }
+  },
+  "steps": [
+    {
+      "type": "wait_for_image",
+      "id": "wait_done_icon",
+      "template_id": "done_icon",
+      "timeout_ms": 2500,
+      "save_as": "done_button"
+    },
+    {
+      "type": "retry",
+      "id": "retry_click",
+      "policy": "quick_retry",
+      "steps": [
+        {
+          "type": "double_click",
+          "id": "double_click_done",
+          "ref": "done_button"
+        },
+        {
+          "type": "verify_image",
+          "id": "verify_done_icon_visible",
+          "template_id": "done_icon"
+        }
+      ]
+    }
+  ]
+}

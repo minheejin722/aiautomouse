@@ -1,0 +1,60 @@
+name: calculator_click_button
+description: Open Calculator and click the equals button via UIA or template matching.
+steps:
+  - id: launch_calculator
+    name: Launch Calculator
+    timeout_ms: 5000
+    retry:
+      attempts: 1
+      delay_ms: 300
+    precondition:
+      kind: always
+    action:
+      kind: launch_process
+      input: calc.exe
+    postcondition:
+      kind: window_title_contains
+      value: Calculator
+    rollback:
+      kind: noop
+    fallback:
+      kind: noop
+  - id: click_equals
+    name: Click equals
+    timeout_ms: 6000
+    retry:
+      attempts: 2
+      delay_ms: 400
+    precondition:
+      kind: target_exists
+      target:
+        window:
+          title_contains: Calculator
+        uia:
+          name: Equals
+          control_type: Button
+        template:
+          path: assets/templates/calc_equals.png
+    action:
+      kind: click
+      target:
+        window:
+          title_contains: Calculator
+        uia:
+          name: Equals
+          control_type: Button
+        template:
+          path: assets/templates/calc_equals.png
+    postcondition:
+      kind: target_exists
+      target:
+        window:
+          title_contains: Calculator
+        uia:
+          automation_id: CalculatorResults
+    rollback:
+      kind: noop
+    fallback:
+      kind: screenshot
+      input: calculator_failure
+

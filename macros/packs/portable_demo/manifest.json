@@ -1,0 +1,21 @@
+{
+  "name": "portable_demo",
+  "description": "Portable macro pack for browser, OCR, and image matching demos.",
+  "macros": [
+    "macros/samples/focus_and_paste.json",
+    "macros/samples/image_click_retry.json",
+    "macros/samples/upload_and_submit.json"
+  ],
+  "snippets": [
+    "assets/snippets/hello.txt",
+    "assets/snippets/prompt_01.txt",
+    "assets/snippets/signature.txt"
+  ],
+  "templates": [
+    "assets/templates/calc_equals.png",
+    "assets/templates/done_icon.png",
+    "assets/templates/upload_button.png"
+  ],
+  "settings": "config/app.json",
+  "emergency_stop_hotkey": "Ctrl+Alt+Pause"
+}

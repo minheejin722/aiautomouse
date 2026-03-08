@@ -1,0 +1,15 @@
+{
+  "name": "done_icon",
+  "notes": "Sample completion-state icon for template matching demos and fallback examples.",
+  "threshold": 0.9,
+  "preferred_theme": "light",
+  "preferred_dpi": 100,
+  "language_hint": "ko,en",
+  "search_region_hint": null,
+  "click_offset": {
+    "x": 0,
+    "y": 0
+  },
+  "use_grayscale": true,
+  "use_mask": false
+}

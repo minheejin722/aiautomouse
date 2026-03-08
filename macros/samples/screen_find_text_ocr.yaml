@@ -1,0 +1,33 @@
+name: screen_find_text_ocr
+description: Search the desktop for text via OCR and click it.
+steps:
+  - id: locate_text
+    name: Locate text on screen
+    timeout_ms: 4000
+    retry:
+      attempts: 2
+      delay_ms: 500
+    precondition:
+      kind: target_exists
+      target:
+        ocr_text:
+          text: Start
+          case_sensitive: false
+    action:
+      kind: click
+      target:
+        ocr_text:
+          text: Start
+          case_sensitive: false
+    postcondition:
+      kind: target_exists
+      target:
+        ocr_text:
+          text: Start
+          case_sensitive: false
+    rollback:
+      kind: noop
+    fallback:
+      kind: screenshot
+      input: ocr_failure
+

@@ -1,0 +1,59 @@
+name: browser_search_cdp
+description: Use Chromium CDP to target a search box and type a query.
+steps:
+  - id: find_search_box
+    name: Resolve search box
+    timeout_ms: 5000
+    retry:
+      attempts: 2
+      delay_ms: 500
+    precondition:
+      kind: target_exists
+      target:
+        dom:
+          css: "input[type='text'], textarea"
+          title_contains: Search
+    action:
+      kind: click
+      target:
+        dom:
+          css: "input[type='text'], textarea"
+          title_contains: Search
+    postcondition:
+      kind: target_exists
+      target:
+        dom:
+          css: "input[type='text'], textarea"
+    rollback:
+      kind: noop
+    fallback:
+      kind: screenshot
+      input: browser_search_failure
+  - id: type_query
+    name: Type query
+    timeout_ms: 4000
+    retry:
+      attempts: 1
+      delay_ms: 250
+    precondition:
+      kind: target_exists
+      target:
+        dom:
+          css: "input[type='text'], textarea"
+    action:
+      kind: type_text
+      target:
+        dom:
+          css: "input[type='text'], textarea"
+      input: desktop automation MVP
+    postcondition:
+      kind: target_exists
+      target:
+        dom:
+          css: "input[type='text'], textarea"
+    rollback:
+      kind: noop
+    fallback:
+      kind: screenshot
+      input: browser_type_failure
+

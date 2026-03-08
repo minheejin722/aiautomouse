@@ -1,0 +1,15 @@
+{
+  "name": "upload_button",
+  "notes": "Sample upload button template for image-search examples and mock integration tests.",
+  "threshold": 0.88,
+  "preferred_theme": "light",
+  "preferred_dpi": 100,
+  "language_hint": "ko,en",
+  "search_region_hint": null,
+  "click_offset": {
+    "x": 0,
+    "y": 0
+  },
+  "use_grayscale": true,
+  "use_mask": false
+}

@@ -1,0 +1,68 @@
+name: notepad_insert_snippet
+description: Launch Notepad, focus the editor, and insert a saved snippet.
+resources:
+  snippets:
+    hello: assets/snippets/hello.txt
+steps:
+  - id: launch_notepad
+    name: Launch Notepad
+    timeout_ms: 5000
+    retry:
+      attempts: 1
+      delay_ms: 300
+    precondition:
+      kind: always
+    action:
+      kind: launch_process
+      input: notepad.exe
+    postcondition:
+      kind: target_exists
+      target:
+        window:
+          class_name: Notepad
+        uia:
+          control_type: Edit
+    rollback:
+      kind: noop
+    fallback:
+      kind: noop
+  - id: insert_snippet
+    name: Paste saved snippet
+    timeout_ms: 8000
+    retry:
+      attempts: 2
+      delay_ms: 500
+    precondition:
+      kind: target_exists
+      target:
+        window:
+          class_name: Notepad
+        uia:
+          control_type: Edit
+    action:
+      kind: paste_text
+      target:
+        window:
+          class_name: Notepad
+        uia:
+          control_type: Edit
+      snippet: hello
+    postcondition:
+      kind: uia_value_contains
+      value: Hello from AIAutoMouse
+      target:
+        window:
+          class_name: Notepad
+        uia:
+          control_type: Edit
+    rollback:
+      kind: hotkey
+      input:
+        - CTRL
+        - A
+      target:
+        window:
+          class_name: Notepad
+    fallback:
+      kind: screenshot
+      input: notepad_failure

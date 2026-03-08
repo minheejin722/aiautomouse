@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0",
+  "name": "conditional_submit",
+  "hotkey": "Ctrl+Alt+3",
+  "variables": {
+    "submit_label": "완료"
+  },
+  "steps": [
+    {
+      "type": "wait_for_text",
+      "id": "wait_submit_text",
+      "query": "${submit_label}",
+      "strategy": "uia_or_ocr",
+      "save_as": "submit_button",
+      "timeout_ms": 3000
+    },
+    {
+      "type": "if",
+      "id": "branch_on_button",
+      "condition": {
+        "type": "ref_exists",
+        "ref": "submit_button"
+      },
+      "then_steps": [
+        {
+          "type": "right_click",
+          "id": "open_context_menu",
+          "ref": "submit_button"
+        },
+        {
+          "type": "press_keys",
+          "id": "dismiss_menu",
+          "keys": "esc"
+        },
+        {
+          "type": "click",
+          "id": "submit_click",
+          "ref": "submit_button"
+        },
+        {
+          "type": "verify_text",
+          "id": "verify_submit_text",
+          "query": "${submit_label}",
+          "strategy": "uia_or_ocr"
+        }
+      ],
+      "else_steps": [
+        {
+          "type": "abort",
+          "id": "abort_missing_submit",
+          "message": "Submit target was not found."
+        }
+      ]
+    }
+  ]
+}
