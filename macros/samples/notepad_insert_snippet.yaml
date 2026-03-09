@@ -2,7 +2,7 @@ name: notepad_insert_snippet
 description: Launch Notepad, focus the editor, and insert a saved snippet.
 resources:
   snippets:
-    hello: assets/snippets/hello.txt
+    hello: assets/snippets/nano banana.txt
 steps:
   - id: launch_notepad
     name: Launch Notepad

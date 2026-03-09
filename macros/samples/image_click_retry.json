@@ -4,7 +4,7 @@
   "hotkey": "Ctrl+Alt+2",
   "resources": {
     "templates": {
-      "done_icon": "assets/templates/calc_equals.png"
+      "done_icon": "assets/templates/new chat.png"
     }
   },
   "retry_policies": {

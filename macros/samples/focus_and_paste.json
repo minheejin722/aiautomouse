@@ -5,7 +5,7 @@
   "target_profile": "default",
   "resources": {
     "snippets": {
-      "prompt_01": "assets/snippets/hello.txt"
+      "prompt_01": "assets/snippets/nano banana.txt"
     }
   },
   "steps": [
