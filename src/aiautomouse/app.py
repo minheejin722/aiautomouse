@@ -46,6 +46,18 @@ class AutomationApplication:
         self._active_tokens: list[EmergencyStopToken] = []
         self._active_lock = threading.Lock()
 
+    def update_settings(self, settings_path: str | Path | None = None) -> None:
+        """Reload settings from disk and reconfigure mutable state in-place.
+
+        This avoids replacing the ``AutomationApplication`` instance so that
+        running macros keep their references to ``_active_tokens``,
+        ``window_manager``, ``input_controller``, etc.
+        """
+        if settings_path is not None:
+            self.settings_path = Path(settings_path)
+        self.settings = AppSettings.load(self.settings_path)
+        self.screen_capture = ScreenCapture(self.window_manager, backend=self.settings.capture.backend)
+
     def run_macro(
         self,
         macro_path: str | Path,
@@ -198,7 +210,7 @@ class AutomationApplication:
             ),
             TemplateMatchProvider(),
         ]
-        return TargetResolver(providers)
+        return TargetResolver(providers, timeout_ms=self.settings.provider_find_timeout_ms)
 
     def _build_browser_adapter(self) -> PlaywrightBrowserAdapter:
         return PlaywrightBrowserAdapter(

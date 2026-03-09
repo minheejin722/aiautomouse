@@ -16,6 +16,13 @@ class MacroAuthoringService:
         self.workspace = Workspace(self.settings)
         self.converter = NaturalLanguageMacroConverter()
 
+    def update_settings(self, settings_path: str | Path | None = None) -> None:
+        """Reload settings and refresh workspace in-place."""
+        if settings_path is not None:
+            self.settings_path = Path(settings_path)
+        self.settings = AppSettings.load(self.settings_path)
+        self.workspace.update_settings(self.settings)
+
     def convert_text(
         self,
         text: str,

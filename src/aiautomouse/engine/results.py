@@ -24,6 +24,10 @@ class TargetResolutionError(AutomationError):
     """Raised when a target cannot be resolved."""
 
 
+class ProviderTimeoutError(TargetResolutionError):
+    """Raised when a provider.find() call exceeds the configured timeout."""
+
+
 class ConditionEvaluationError(AutomationError):
     """Raised when a condition fails unexpectedly."""
 

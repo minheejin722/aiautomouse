@@ -274,3 +274,12 @@ class Workspace:
         self.macros = MacroRepository(settings.paths.macros_dir)
         self.hotkeys = HotkeyConfigRepository(settings.paths.hotkeys_path)
         self.runs = RunHistoryRepository(settings.paths.artifacts_dir)
+
+    def update_settings(self, settings: AppSettings) -> None:
+        """Reconfigure repositories in-place without replacing the Workspace instance."""
+        self.settings = settings
+        self.snippets = SnippetRepository(settings.paths.snippets_dir)
+        self.templates = TemplateRepository(settings.paths.templates_dir)
+        self.macros = MacroRepository(settings.paths.macros_dir)
+        self.hotkeys = HotkeyConfigRepository(settings.paths.hotkeys_path)
+        self.runs = RunHistoryRepository(settings.paths.artifacts_dir)

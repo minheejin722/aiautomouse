@@ -110,6 +110,7 @@ class AppSettings(BaseModel):
 
     log_level: str = "INFO"
     poll_interval_ms: int = 250
+    provider_find_timeout_ms: int = 30000
     overlay: OverlaySettings = Field(default_factory=OverlaySettings)
     cdp: CdpSettings = Field(default_factory=CdpSettings)
     browser: BrowserSettings = Field(default_factory=BrowserSettings)

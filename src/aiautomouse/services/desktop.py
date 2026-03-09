@@ -25,11 +25,12 @@ class DesktopAutomationService:
     def save_settings(self, settings: AppSettings) -> Path:
         settings.ensure_directories()
         saved = settings.save(self.settings_path)
-        self.settings = AppSettings.load(self.settings_path)
-        self.automation_app = AutomationApplication(self.settings_path)
-        self.workspace = Workspace(self.settings)
-        self.authoring = MacroAuthoringService(self.settings_path)
-        self.hotkeys = HotkeyServiceController(self.automation_app, self.workspace.hotkeys)
+        self.automation_app.update_settings(self.settings_path)
+        self.settings = self.automation_app.settings
+        self.workspace.update_settings(self.settings)
+        self.authoring.update_settings(self.settings_path)
+        self.hotkeys.automation_app = self.automation_app
+        self.hotkeys.hotkey_repository = self.workspace.hotkeys
         write_macro_json_schema(self.settings.paths.schema_path)
         return saved
 
