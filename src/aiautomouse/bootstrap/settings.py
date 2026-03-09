@@ -73,6 +73,7 @@ class OcrSettings(BaseModel):
     backends: list[str] = Field(default_factory=lambda: ["windows", "tesseract", "easyocr"])
     tesseract_cmd: str | None = None
     easyocr_languages: list[str] = Field(default_factory=lambda: ["en", "ko"])
+    easyocr_gpu: bool = False
     rate_limit_ms: int = 150
     cache_size: int = 128
 

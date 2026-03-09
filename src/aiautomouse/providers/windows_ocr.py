@@ -195,8 +195,9 @@ class TesseractOcrBackend(OcrBackend):
 class EasyOcrBackend(OcrBackend):
     name = "easyocr"
 
-    def __init__(self, languages: list[str]) -> None:
+    def __init__(self, languages: list[str], gpu: bool = False) -> None:
         self.languages = languages
+        self.gpu = gpu
         self._reader = None
 
     def is_available(self) -> bool:
@@ -211,7 +212,7 @@ class EasyOcrBackend(OcrBackend):
         import numpy
 
         if self._reader is None:
-            self._reader = easyocr.Reader(self.languages, gpu=False, verbose=False)
+            self._reader = easyocr.Reader(self.languages, gpu=self.gpu, verbose=False)
         results: list[OcrTextResult] = []
         for index, (box, text, confidence) in enumerate(self._reader.readtext(numpy.array(frame.image))):
             if not text:
@@ -243,6 +244,7 @@ class WindowsOcrProvider(LocatorProvider):
         backends: list[str | OcrBackend] | None = None,
         tesseract_cmd: str | None = None,
         easyocr_languages: list[str] | None = None,
+        easyocr_gpu: bool = False,
         rate_limit_ms: int = 150,
         cache_size: int = 128,
     ) -> None:
@@ -257,7 +259,7 @@ class WindowsOcrProvider(LocatorProvider):
             elif normalized == "tesseract":
                 self.backends.append(TesseractOcrBackend(tesseract_cmd=tesseract_cmd))
             elif normalized == "easyocr":
-                self.backends.append(EasyOcrBackend(languages=easyocr_languages or ["en"]))
+                self.backends.append(EasyOcrBackend(languages=easyocr_languages or ["en"], gpu=easyocr_gpu))
         self.rate_limiter = OcrRateLimiter(rate_limit_ms)
         self.recognition_cache = OcrResultCache(cache_size)
         self.selection_cache = OcrResultCache(cache_size * 2)

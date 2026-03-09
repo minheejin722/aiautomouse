@@ -192,6 +192,7 @@ class AutomationApplication:
                 backends=self.settings.ocr.backends,
                 tesseract_cmd=self.settings.ocr.tesseract_cmd,
                 easyocr_languages=self.settings.ocr.easyocr_languages,
+                easyocr_gpu=self.settings.ocr.easyocr_gpu,
                 rate_limit_ms=self.settings.ocr.rate_limit_ms,
                 cache_size=self.settings.ocr.cache_size,
             ),

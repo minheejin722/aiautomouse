@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from aiautomouse.engine.actions import ActionExecutor
+from aiautomouse.engine.context import RuntimeContext
 from aiautomouse.engine.conditions import ConditionEvaluator
 from aiautomouse.engine.loader import load_macro, resolve_retry_policy
 from aiautomouse.engine.models import (
@@ -28,6 +29,7 @@ from aiautomouse.engine.models import (
     PasteSnippetStep,
     PressKeysStep,
     RetryBlockStep,
+    RightClickRefStep,
     RightClickStep,
     StepSpec,
     TextExistsCondition,
@@ -69,7 +71,7 @@ class MacroRunner:
         self.condition_evaluator = condition_evaluator or ConditionEvaluator()
         self.action_executor = action_executor or ActionExecutor()
 
-    def run(self, macro: MacroSpec, ctx: object) -> MacroRunResult:
+    def run(self, macro: MacroSpec, ctx: RuntimeContext) -> MacroRunResult:
         started_at = time.perf_counter()
         ctx.macro = macro
         ctx._variable_stack = [dict(macro.variables)]
@@ -133,7 +135,7 @@ class MacroRunner:
             summary_path=str(summary_path),
         )
 
-    def _execute_steps(self, steps: list[StepSpec], ctx: object, namespace: str) -> tuple[list[StepResult], bool, str | None]:
+    def _execute_steps(self, steps: list[StepSpec], ctx: RuntimeContext, namespace: str) -> tuple[list[StepResult], bool, str | None]:
         results: list[StepResult] = []
         for step in steps:
             step_path = f"{namespace}.{step.id or step.type}"
@@ -143,7 +145,7 @@ class MacroRunner:
                 return results, False, error
         return results, True, None
 
-    def _execute_step(self, step: StepSpec, ctx: object, step_path: str) -> tuple[list[StepResult], bool, str | None]:
+    def _execute_step(self, step: StepSpec, ctx: RuntimeContext, step_path: str) -> tuple[list[StepResult], bool, str | None]:
         if isinstance(step, LegacyCompatStep):
             return self._execute_legacy_step(step, ctx, step_path)
 
@@ -272,7 +274,7 @@ class MacroRunner:
         )
         return last_outcome.child_results + [result], False, last_outcome.error
 
-    def _execute_step_once(self, step: StepSpec, ctx: object, step_path: str) -> StepExecutionOutcome:
+    def _execute_step_once(self, step: StepSpec, ctx: RuntimeContext, step_path: str) -> StepExecutionOutcome:
         try:
             if isinstance(step, FocusWindowStep):
                 return StepExecutionOutcome(success=True, details=self.action_executor.focus_window(
@@ -324,7 +326,7 @@ class MacroRunner:
                 )
             if isinstance(step, DoubleClickStep):
                 return self._execute_click_variant(step, ctx, button="left", double=True)
-            if step.type == "right_click_ref":
+            if isinstance(step, RightClickRefStep):
                 return StepExecutionOutcome(
                     success=True,
                     details=self.action_executor.click_ref(step.ref, ctx, button="right", offset=step.offset),
@@ -436,7 +438,7 @@ class MacroRunner:
             return StepExecutionOutcome(success=False, error=str(exc))
         return StepExecutionOutcome(success=False, error=f"Unsupported step type: {step.type}")
 
-    def _execute_click_variant(self, step, ctx: object, *, button: str, double: bool) -> StepExecutionOutcome:
+    def _execute_click_variant(self, step, ctx: RuntimeContext, *, button: str, double: bool) -> StepExecutionOutcome:
         if getattr(step, "ref", None):
             return StepExecutionOutcome(
                 success=True,
@@ -462,7 +464,7 @@ class MacroRunner:
             return StepExecutionOutcome(success=True, details=self.action_executor.double_click_xy(x, y, ctx))
         return StepExecutionOutcome(success=True, details=self.action_executor.click_xy(x, y, ctx))
 
-    def _resolve_find_text(self, step: FindTextStep, ctx: object) -> StepExecutionOutcome:
+    def _resolve_find_text(self, step: FindTextStep, ctx: RuntimeContext) -> StepExecutionOutcome:
         target = build_text_target(
             query=ctx.render_string(step.query),
             strategy=step.strategy,
@@ -491,7 +493,7 @@ class MacroRunner:
             details={"match": match.to_dict(), "save_as": step.save_as},
         )
 
-    def _resolve_find_image(self, step: FindImageStep, ctx: object) -> StepExecutionOutcome:
+    def _resolve_find_image(self, step: FindImageStep, ctx: RuntimeContext) -> StepExecutionOutcome:
         target = build_image_target(
             template_id=step.template_id,
             template_path=step.template_path,
@@ -514,7 +516,7 @@ class MacroRunner:
             details={"match": match.to_dict(), "save_as": step.save_as},
         )
 
-    def _wait_for_text(self, step: WaitForTextStep, ctx: object) -> StepExecutionOutcome:
+    def _wait_for_text(self, step: WaitForTextStep, ctx: RuntimeContext) -> StepExecutionOutcome:
         condition = TextExistsCondition(
             type="text_exists",
             query=step.query,
@@ -569,7 +571,7 @@ class MacroRunner:
             ctx,
         )
 
-    def _wait_for_image(self, step: WaitForImageStep, ctx: object) -> StepExecutionOutcome:
+    def _wait_for_image(self, step: WaitForImageStep, ctx: RuntimeContext) -> StepExecutionOutcome:
         condition = ImageExistsCondition(
             type="image_exists",
             template_id=step.template_id,
@@ -616,7 +618,7 @@ class MacroRunner:
     def _execute_retry_block(
         self,
         step: RetryBlockStep,
-        ctx: object,
+        ctx: RuntimeContext,
         step_path: str,
         started_at: float,
     ) -> tuple[list[StepResult], bool, str | None]:
@@ -717,7 +719,7 @@ class MacroRunner:
         )
         return last_results + [result], False, last_error
 
-    def _execute_call_submacro(self, step: CallSubmacroStep, ctx: object, step_path: str) -> StepExecutionOutcome:
+    def _execute_call_submacro(self, step: CallSubmacroStep, ctx: RuntimeContext, step_path: str) -> StepExecutionOutcome:
         if step.submacro:
             if step.submacro not in ctx.macro.submacros:
                 return StepExecutionOutcome(success=False, error=f"Unknown submacro: {step.submacro}")
@@ -752,7 +754,7 @@ class MacroRunner:
             child_results=child_results,
         )
 
-    def _execute_legacy_step(self, step: LegacyCompatStep, ctx: object, step_path: str) -> tuple[list[StepResult], bool, str | None]:
+    def _execute_legacy_step(self, step: LegacyCompatStep, ctx: RuntimeContext, step_path: str) -> tuple[list[StepResult], bool, str | None]:
         started_at = ctx.mark_step_started(step_path)
         initial_artifacts = self._record_step_artifacts(ctx, step, step_path, "before", attempt=0)
         legacy = step.legacy
@@ -866,7 +868,7 @@ class MacroRunner:
         )
         return [result], False, last_error
 
-    def _wait_for_condition(self, condition, timeout_ms: int, ctx: object) -> bool:
+    def _wait_for_condition(self, condition, timeout_ms: int, ctx: RuntimeContext) -> bool:
         deadline = time.perf_counter() + (timeout_ms / 1000.0)
         while time.perf_counter() <= deadline:
             ctx.check_cancelled()
@@ -875,7 +877,7 @@ class MacroRunner:
             ctx.sleep(ctx.settings.poll_interval_ms)
         return False
 
-    def _wait_for_legacy_condition(self, condition, timeout_ms: int, ctx: object) -> bool:
+    def _wait_for_legacy_condition(self, condition, timeout_ms: int, ctx: RuntimeContext) -> bool:
         deadline = time.perf_counter() + (timeout_ms / 1000.0)
         while time.perf_counter() <= deadline:
             ctx.check_cancelled()
@@ -889,7 +891,7 @@ class MacroRunner:
 
     def _record_step_artifacts(
         self,
-        ctx: object,
+        ctx: RuntimeContext,
         step: StepSpec,
         step_path: str,
         phase: str,
@@ -944,7 +946,7 @@ class MacroRunner:
         return merged
 
     @contextlib.contextmanager
-    def _macro_scope(self, ctx: object, macro: MacroSpec, macro_path: Path, snippets, templates):
+    def _macro_scope(self, ctx: RuntimeContext, macro: MacroSpec, macro_path: Path, snippets, templates):
         previous_macro = ctx.macro
         previous_macro_path = ctx.macro_path
         previous_snippets = ctx.snippets

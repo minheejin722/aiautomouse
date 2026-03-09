@@ -7,7 +7,7 @@ name = "aiautomouse"
 version = "0.1.0"
 description = "Windows desktop automation MVP with deterministic YAML/JSON macros."
 readme = "README.md"
-requires-python = ">=3.10,<3.11"
+requires-python = ">=3.10,<3.13"
 dependencies = [
   "easyocr>=1.7.2",
   "mss>=9.0.1",
@@ -15,7 +15,6 @@ dependencies = [
   "opencv-python>=4.10.0.84",
   "Pillow>=10.4.0",
   "playwright>=1.52.0",
-  "PyInstaller>=6.13.0",
   "pydantic>=2.8.2",
   "pywinauto>=0.6.8",
   "PyYAML>=6.0.2",

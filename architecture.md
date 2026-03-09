@@ -102,11 +102,11 @@ The resolver is deterministic and never reorders providers based on heuristics.
 - `Snippets` tab stores text snippets under `assets/snippets`.
 - `Templates` tab imports files or captures a cropped region from the desktop into `assets/templates`.
 - `Macros` tab edits raw JSON/YAML, validates against schema, and manages per-macro hotkeys.
-- `Run / Logs` tab executes macros in dry-run or execute mode and reads artifacts from `artifacts/runs`.
+- `Run / Logs` tab executes macros in dry-run or execute mode and reads artifacts from `logs/runs`.
 - `Settings` tab edits CDP, OCR backend order, capture backend, overlay, and hotkey service state.
 
 ## Artifacts
-Each run creates `artifacts/runs/<run_id>/`:
+Each run creates `logs/runs/<run_id>/`:
 - `events.jsonl`
 - `macro_resolved.json`
 - `screenshots/`

@@ -25,6 +25,7 @@ Windows 10 oriented desktop automation toolkit for VS Code + Codex workflows. Ru
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
+pip install -e .
 playwright install chromium
 aiautomouse doctor
 aiautomouse gui

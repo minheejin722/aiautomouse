@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from aiautomouse.engine.context import RuntimeContext
 from aiautomouse.engine.models import TargetSpec
 from aiautomouse.engine.results import TargetResolutionError
 
@@ -11,7 +12,7 @@ class TargetResolver:
     def ordered_provider_names(self) -> list[str]:
         return [provider.name for provider in self.providers]
 
-    def resolve(self, target: TargetSpec, ctx: object):
+    def resolve(self, target: TargetSpec, ctx: RuntimeContext):
         if not target.has_any:
             raise TargetResolutionError("Target has no locator data")
         errors: list[str] = []

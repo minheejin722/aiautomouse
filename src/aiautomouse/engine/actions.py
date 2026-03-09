@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import subprocess
+
+from aiautomouse.engine.context import RuntimeContext
 from typing import Any
 
 from aiautomouse.engine.models import LegacyActionSpec, OffsetSpec, TargetSpec, WindowLocatorSpec
@@ -10,7 +12,7 @@ from aiautomouse.engine.results import ActionExecutionError, TargetMatch
 class ActionExecutor:
     def open_page(
         self,
-        ctx: object,
+        ctx: RuntimeContext,
         *,
         url: str,
         new_tab: bool = True,
@@ -54,7 +56,7 @@ class ActionExecutor:
 
     def focus_window(
         self,
-        ctx: object,
+        ctx: RuntimeContext,
         *,
         title: str | None = None,
         title_contains: str | None = None,
@@ -96,7 +98,7 @@ class ActionExecutor:
         ctx.refresh_active_window()
         return {"window": info}
 
-    def resolve_target(self, target: TargetSpec, ctx: object, save_as: str | None = None, label: str = "") -> TargetMatch:
+    def resolve_target(self, target: TargetSpec, ctx: RuntimeContext, save_as: str | None = None, label: str = "") -> TargetMatch:
         resolved_target = ctx.resolve_target(target)
         match = ctx.resolver.resolve(resolved_target, ctx)
         ctx.overlay.show_target(match, label=label or "target", status="resolved")
@@ -107,7 +109,7 @@ class ActionExecutor:
     def click_ref(
         self,
         ref: str,
-        ctx: object,
+        ctx: RuntimeContext,
         *,
         button: str = "left",
         double: bool = False,
@@ -133,22 +135,22 @@ class ActionExecutor:
                 ctx.input_controller.click(point[0], point[1], button=button)
         return {"ref": ref, "point": point, "provider": match.provider_name, "button": button}
 
-    def click_xy(self, x: int, y: int, ctx: object) -> dict[str, Any]:
+    def click_xy(self, x: int, y: int, ctx: RuntimeContext) -> dict[str, Any]:
         if not ctx.is_dry_run:
             ctx.input_controller.click(x, y, button="left")
         return {"point": (x, y)}
 
-    def double_click_xy(self, x: int, y: int, ctx: object) -> dict[str, Any]:
+    def double_click_xy(self, x: int, y: int, ctx: RuntimeContext) -> dict[str, Any]:
         if not ctx.is_dry_run:
             ctx.input_controller.double_click(x, y, button="left")
         return {"point": (x, y)}
 
-    def right_click_xy(self, x: int, y: int, ctx: object) -> dict[str, Any]:
+    def right_click_xy(self, x: int, y: int, ctx: RuntimeContext) -> dict[str, Any]:
         if not ctx.is_dry_run:
             ctx.input_controller.click(x, y, button="right")
         return {"point": (x, y)}
 
-    def type_text(self, text: str, ctx: object, ref: str | None = None) -> dict[str, Any]:
+    def type_text(self, text: str, ctx: RuntimeContext, ref: str | None = None) -> dict[str, Any]:
         point = None
         browser_match = None
         if ref:
@@ -170,7 +172,7 @@ class ActionExecutor:
             ctx.input_controller.type_text(text)
         return {"text": text, "point": point, "ref": ref}
 
-    def paste_snippet(self, snippet_id: str, ctx: object, ref: str | None = None) -> dict[str, Any]:
+    def paste_snippet(self, snippet_id: str, ctx: RuntimeContext, ref: str | None = None) -> dict[str, Any]:
         text = ctx.snippets.get(snippet_id)
         point = None
         browser_match = None
@@ -205,7 +207,7 @@ class ActionExecutor:
         ctx.remember_clipboard(before=clipboard_before, after=text)
         return {"snippet_id": snippet_id, "text": text, "point": point, "ref": ref}
 
-    def press_keys(self, keys: str | list[str], ctx: object) -> dict[str, Any]:
+    def press_keys(self, keys: str | list[str], ctx: RuntimeContext) -> dict[str, Any]:
         chords = self._parse_key_sequence(keys)
         if ctx.browser is not None and ctx.browser.has_active_page():
             if ctx.is_dry_run:
@@ -219,7 +221,7 @@ class ActionExecutor:
     def upload_files(
         self,
         files: str | list[str],
-        ctx: object,
+        ctx: RuntimeContext,
         *,
         ref: str | None = None,
         target: TargetSpec | None = None,
@@ -242,12 +244,12 @@ class ActionExecutor:
             return {"files": files, "ref": ref, "provider": "browser_cdp", "mode": "dry-run"}
         return ctx.browser.upload_files(files, match=match, allow_file_chooser=allow_file_chooser, ctx=ctx)
 
-    def capture_screenshot(self, name: str, ctx: object) -> dict[str, Any]:
+    def capture_screenshot(self, name: str, ctx: RuntimeContext) -> dict[str, Any]:
         path = ctx.artifacts.capture_named_screenshot(name, ctx.screen_capture)
         ctx.remember_screenshot(str(path) if path else None)
         return {"path": str(path) if path else None}
 
-    def launch_process(self, command: str | list[str], ctx: object) -> dict[str, Any]:
+    def launch_process(self, command: str | list[str], ctx: RuntimeContext) -> dict[str, Any]:
         if isinstance(command, str):
             command_list = [ctx.render_string(command)]
         else:
@@ -256,7 +258,7 @@ class ActionExecutor:
             subprocess.Popen(command_list)
         return {"command": command_list}
 
-    def execute_legacy(self, action: LegacyActionSpec, ctx: object) -> dict[str, Any]:
+    def execute_legacy(self, action: LegacyActionSpec, ctx: RuntimeContext) -> dict[str, Any]:
         kind = action.kind.lower()
         if kind == "noop":
             return {"kind": kind}
@@ -338,7 +340,7 @@ class ActionExecutor:
             raise ActionExecutionError("keys must contain at least one token")
         return chords
 
-    def _resolve_text_payload(self, value: Any, ctx: object) -> str:
+    def _resolve_text_payload(self, value: Any, ctx: RuntimeContext) -> str:
         if value is None:
             raise ActionExecutionError("text action requires input")
         if isinstance(value, (str, int, float)):
